@@ -1,0 +1,5 @@
+city,variable,value
+Hamburg,travel_time_overall_h,211
+Hamburg,traffic_time_overall_h,78
+Hamburg,mean_travel_time_10km_min,23.833333333333332
+Hamburg,optimal_travel_time_10km_min,17.84063509421667

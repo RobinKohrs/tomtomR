@@ -1,0 +1,13 @@
+.quarto-title-block{
+  padding: 2rem;
+}
+
+
+body{
+  color: #008080;
+}
+
+#quarto-appendix{
+  background-color: red;
+  padding: 2rem;
+}

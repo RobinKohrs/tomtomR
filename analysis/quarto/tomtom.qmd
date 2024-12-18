@@ -1,0 +1,257 @@
+---
+title: "TomTom Traffic Index"
+author: "Robin Kohrs"
+bibliography: refs.bib
+csl: german-council-of-economic-experts.csl
+lang: de
+date: today
+format:
+  html:
+    code-fold: true
+    toc: true
+    toc-location: body
+    toc-title: Übersicht
+    css: style.css
+    theme: cosmo   # cosmo bootswatch theme
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(here)
+library(glue)
+library(sf)
+library(rajudas) # own package but I think I'm not using it here..
+library(jsonlite)
+library(readxl)
+library(gt)
+library(gtExtras)
+```
+
+```{r}
+#| message: false
+# data loading ------------------------------------------------------------
+path_data_csv = here("data_raw/AW Daten des TomTom Traffic Index 2024/231222 TomTom Traffic Stats_All Cities.csv")
+path_data_excel = here("data_raw/AW Daten des TomTom Traffic Index 2024/231222 TomTom Traffic Index Stats_All Cities.xlsx")
+
+data_csv = read_csv(path_data_csv)
+data_xls = read_xlsx(path_data_excel)
+
+# use csv for now ---------------------------------------------------------
+data = data_csv
+
+# funtion to create path
+makePath = function(path) {
+  is_file = str_detect(basename(path), "\\.")
+  if (is_file) {
+    dirFromPath = dirname(path)
+    if (!dir.exists(dirFromPath)) {
+      dir.create(dirFromPath, recursive = T)
+    }
+    return(path)
+  }
+  else {
+    dir.create(path, recursive = T)
+    return(path)
+  }
+}
+
+# function to rename german cities and translate to German
+translateGermanCities = function(df){
+  df %>%
+    mutate(
+      city = case_when(
+        city == "Frankfurt-am-main" ~ "Frankfurt am Main",
+        city == "Cologne" ~ "Köln",
+        city == "Dusseldorf" ~ "Düsseldorf",
+        city == "Monchengladbach" ~ "Mönchengladbach",
+        city == "Munich" ~ "München",
+        city == "Nuremberg" ~ "Nürnberg",
+        city == "Munster" ~ "Münster",
+        city == "Ruhr-region-east" ~ "Ruhrregion Ost",
+        city == "Ruhr-region-west" ~ "Ruhrregion West",
+        .default = city
+      )
+    )  -> df
+}
+
+data = data %>% filter(country=="Germany") %>% translateGermanCities()
+```
+
+# Durchschnittliche Geschwindigkeit  in  deutschen Städten/Regionen
+
+```{r}
+#| warning: false
+
+op_avg_speed_per_km_german_cities = makePath(here("output/data/dw/year_avg_speed_german_cities.csv"))
+
+# data on the average speed in each city per year!
+data %>%
+  filter(country == "Germany") %>%
+  select(year, area, city, country, yearAvgSpeedKmh) %>%
+  pivot_wider(names_from = "year",
+              values_from = yearAvgSpeedKmh)  %>% translateGermanCities() -> data_avg_speed_per_km_german_cities
+
+# use the urban region (alternively use the metro region)
+data_avg_speed_per_km_german_cities %>% 
+  filter(area == "urban") -> data_avg_speed_per_km_german_cities_urban
+
+
+write_csv(data_avg_speed_per_km_german_cities, op_avg_speed_per_km_german_cities)
+
+# data_avg_speed_per_km_german_cities_urban %>% 
+#   pivot_longer(
+#     cols = matches("\\d{4}"),
+#     names_to = "year",
+#     values_to = "yearAvgSpeedKmh"
+#   ) %>% 
+#   group_by(city) %>% 
+#   arrange(year, .by_group = T) %>% 
+#   summarise(
+#     `2023` = yearAvgSpeedKmh[year=="2023"],
+#     "Diff. 2023 zu 2019" = yearAvgSpeedKmh[year=="2023"] - yearAvgSpeedKmh[year=="2019"],
+#     "2019 bis 2023" = list(yearAvgSpeedKmh),
+#   ) %>% 
+#   arrange(`2023`) %>% 
+#   gt() %>% 
+#   tab_header(
+#     title = "Durchschnittliche Geschwidigkeit in deutschen Städten",
+#     subtitle = "in kmh"
+#     ) %>% 
+#   gtExtras::gt_plt_sparkline("2019 bis 2023", fig_dim = c(15,30)) %>% 
+#   opt_interactive(use_pagination = T)
+  
+```
+
+
+# Durchschnittliche Fahrzeit für 10 km in deutschen Städten
+
+in Sekunden pro Kilometer
+
+```{r}
+#| warning: false
+
+op_avg_travel_time_per_km = makePath(here("output/data/dw/year_avg_travel_time_km.csv"))
+
+# maybe just use a variable... All the rest is same to above..
+var = "yearTravelTimePerKm"
+
+# data on the average speed in each city per year!
+data %>%
+  filter(country == "Germany") %>%
+  select(year, area, city, country, all_of(var)) %>% 
+  pivot_wider(names_from = "year",
+              values_from = all_of(var))  %>% translateGermanCities() -> data_avg_travel_time_km_german_cities
+
+# use the urban region (alternively use the metro region)
+data_avg_travel_time_km_german_cities %>% 
+  filter(area == "urban") -> data_avg_travel_time_km_german_cities_urban
+
+
+write_csv(data_avg_travel_time_km_german_cities_urban, op_avg_travel_time_per_km)
+
+# data_avg_travel_time_km_german_cities_urban %>% 
+#   pivot_longer(
+#     cols = matches("\\d{4}"),
+#     names_to = "year",
+#     values_to = var
+#   ) %>% 
+#   group_by(city) %>% 
+#   arrange(year, .by_group = T) %>% 
+#   mutate("{var}" := round((.data[[var]] * 10) / 60,2)) %>% 
+#   summarise(
+#     `2023` = .data[[var]][year=="2023"],
+#     "{var}" := list(.data[[var]]),
+#   ) %>% 
+#   arrange(desc(`2023`)) %>% 
+#   gt() %>% 
+#   tab_header(
+#     title = "Durchschnittliche Fahrzeit in deutschen Städten",
+#     subtitle = "in Minuten pro 10 Kilometer - Während des gesamten Verkehrs"
+#     ) %>% 
+#   gtExtras::gt_plt_sparkline(var, fig_dim = c(15,30)) %>% 
+#   opt_interactive(use_pagination = T)
+```
+
+# Was ein Jahr Berufsverkehr bedeutet
+
+```{r}
+
+op_one_year_berufsverkehr = makePath(here("output/data/dw/one_year_berufsverkehr_hh.csv"))
+
+working_days_per_year = 230
+single_way_km = 10
+km_per_year = working_days_per_year * single_way_km * 2
+
+
+data %>%
+  select(
+    year,
+    area,
+    city,
+    country,
+    yearTravelTimePerKm,
+    yearTravelTimeOptimumPerKm,
+    yearTimeLostPerKm
+  ) %>%
+  filter(year == 2023, area == "urban") %>%
+  filter(city == "Hamburg") %>%
+  mutate(
+    reisezeit_all_year_h = round(yearTravelTimePerKm * km_per_year / (60 * 60), 0),
+    stautime_per_year = round(yearTimeLostPerKm * km_per_year / (60 * 60), 0),
+    durchschnittliche_reisezeit_ein_weg = round((yearTravelTimePerKm * single_way_km) / 60, 0),
+    optimale_reisezeit_ein_weg = round((
+      yearTravelTimeOptimumPerKm * single_way_km
+    ) / 60, 0)
+  ) -> data_one_year_berufsverkehr_hh
+
+write_csv(data_one_year_berufsverkehr_hh, op_one_year_berufsverkehr)
+
+# data_one_year_berufsverkehr_hh %>% 
+#   select(
+#     "Insgesamte Reisezeit (h.)" = reisezeit_all_year_h,
+#     "Davon im Stau verbracht (h.)" = stautime_per_year,
+#     "Durschnittsdauer ein Weg (Min.)" = durchschnittliche_reisezeit_ein_weg,
+#     "Optimalte Dauer ein Weg (Min.)" = optimale_reisezeit_ein_weg
+#   ) %>% 
+#   gt() %>% 
+#   tab_header(
+#     title = "Ein Jahr Berfusverkehr in Hamburg",
+#     subtitle = "angenommen ein Weg ist 10km und es gibt 230 Arbeitstage an denen auch gefahren wird"
+#     ) 
+```
+
+# Berufsverkehr morgens noch besser als abends
+
+Im Schnitt aller deutschen Städte auf 10 km etwa 1,5 Minuten schneller morgens!
+
+In Hamburg knapp eine Minute
+
+```{r}
+data %>% 
+  select(area, city, country, year, amPeakTravelTimePerKm, pmPeakTravelTimePerKm) %>% 
+  filter(area=="urban", year==2023) %>% 
+  mutate(
+    across(matches("^am|pm"), function(x){
+      round((x * 10) / 60, 2)
+    }),
+    diff_morgens_abends = amPeakTravelTimePerKm - pmPeakTravelTimePerKm
+  ) %>% select(city, "10 km morgens" = amPeakTravelTimePerKm, "10 km abends" = pmPeakTravelTimePerKm, "Diff Morgens Abends" = diff_morgens_abends) -> data_morgens_abends
+
+mean(data_morgens_abends$`Diff Morgens Abends`)  
+
+data_morgens_abends %>% 
+  gt() %>% 
+  gt_plt_bar(`Diff Morgens Abends`)
+```
+
+
+
+
+
+
+
+
+
+
+

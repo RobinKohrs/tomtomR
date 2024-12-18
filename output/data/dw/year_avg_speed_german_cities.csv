@@ -1,0 +1,55 @@
+area,city,country,2023,2022,2021,2020,2019
+metro,Aachen,Germany,32,33,33,33,33
+metro,Augsburg,Germany,42,43,42,43,42
+metro,Berlin,Germany,33,33,34,34,33
+metro,Bielefeld,Germany,42,42,42,44,43
+metro,Bonn,Germany,38,41,42,43,40
+metro,Bremen,Germany,42,41,44,45,43
+metro,Köln,Germany,43,44,44,46,44
+metro,Dresden,Germany,34,34,34,35,35
+metro,Düsseldorf,Germany,43,43,44,45,43
+metro,Frankfurt am Main,Germany,32,31,33,33,32
+metro,Freiburg,Germany,40,40,40,41,40
+metro,Hamburg,Germany,36,35,36,37,36
+metro,Hannover,Germany,40,40,42,42,42
+metro,Karlsruhe,Germany,47,46,47,48,47
+metro,Kassel,Germany,39,39,40,41,40
+metro,Kiel,Germany,44,46,45,46,45
+metro,Leipzig,Germany,38,38,38,39,39
+metro,Mannheim,Germany,36,36,38,40,39
+metro,Mönchengladbach,Germany,36,36,36,37,37
+metro,München,Germany,36,35,36,37,36
+metro,Münster,Germany,37,35,35,36,36
+metro,Nürnberg,Germany,35,35,35,35,35
+metro,Ruhrregion Ost,Germany,47,47,48,50,49
+metro,Ruhrregion West,Germany,47,48,50,52,51
+metro,Stuttgart,Germany,40,40,40,41,40
+metro,Wiesbaden,Germany,33,33,35,39,39
+metro,Wuppertal,Germany,49,51,51,53,54
+urban,Aachen,Germany,31,32,33,33,33
+urban,Augsburg,Germany,41,41,41,42,41
+urban,Berlin,Germany,27,27,27,28,27
+urban,Bielefeld,Germany,37,37,37,39,38
+urban,Bonn,Germany,38,42,42,43,40
+urban,Bremen,Germany,36,37,38,38,37
+urban,Köln,Germany,30,30,31,31,30
+urban,Dresden,Germany,30,30,31,31,30
+urban,Düsseldorf,Germany,32,32,33,34,32
+urban,Frankfurt am Main,Germany,29,28,30,31,30
+urban,Freiburg,Germany,37,37,37,37,37
+urban,Hamburg,Germany,25,26,26,27,26
+urban,Hannover,Germany,32,33,34,35,34
+urban,Karlsruhe,Germany,43,41,42,44,43
+urban,Kassel,Germany,30,31,31,32,31
+urban,Kiel,Germany,41,43,42,43,42
+urban,Leipzig,Germany,28,28,28,29,29
+urban,Mannheim,Germany,35,34,37,39,38
+urban,Mönchengladbach,Germany,32,33,33,33,33
+urban,München,Germany,29,30,30,31,29
+urban,Münster,Germany,34,32,32,33,32
+urban,Nürnberg,Germany,33,33,33,33,32
+urban,Ruhrregion Ost,Germany,52,52,51,53,52
+urban,Ruhrregion West,Germany,40,41,41,42,40
+urban,Stuttgart,Germany,31,32,31,32,31
+urban,Wiesbaden,Germany,30,31,33,37,36
+urban,Wuppertal,Germany,46,49,49,50,51
